@@ -20,19 +20,23 @@ export default defineConfig({
     },
   },
   networks: {
-    hardhatMainnet: {
-      type: "edr-simulated",
-      chainType: "l1",
+    robinhood: {
+      url: process.env.RH_RPC_URL as string,
+      chainId: 4663,
+      accounts: [process.env.PRIVATE_KEY as `0x${string}`],
     },
-    hardhatOp: {
-      type: "edr-simulated",
-      chainType: "op",
-    },
-    sepolia: {
-      type: "http",
-      chainType: "l1",
-      url: configVariable("SEPOLIA_RPC_URL"),
-      accounts: [configVariable("SEPOLIA_PRIVATE_KEY")],
-    },
+  },
+   etherscan: {
+    apiKey: { robinhood: "empty" },
+    customChains: [
+      {
+        network: "robinhood",
+        chainId: 4663,
+        urls: {
+          apiURL: "https://robinhoodchain.blockscout.com/api",
+          browserURL: "https://robinhoodchain.blockscout.com/",
+        },
+      },
+    ],
   },
 });
