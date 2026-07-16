@@ -27,6 +27,12 @@ export default defineConfig({
       chainId: 4663,
       accounts: [process.env.PRIVATE_KEY as `0x${string}`],
     },
+    robinhoodTestnet: {
+      type: "http",
+      url: process.env.RH_TESTNET_RPC_URL as string,
+      chainId: 46630,
+      accounts: [process.env.PRIVATE_KEY as `0x${string}`],
+    },
   },
   etherscan: {
     apiKey: { robinhood: "empty" },
@@ -34,6 +40,14 @@ export default defineConfig({
       {
         network: "robinhood",
         chainId: 4663,
+        urls: {
+          apiURL: "https://robinhoodchain.blockscout.com/api",
+          browserURL: "https://robinhoodchain.blockscout.com/",
+        },
+      },
+      {
+        network: "robinhoodTestnet",
+        chainId: 46630,
         urls: {
           apiURL: "https://robinhoodchain.blockscout.com/api",
           browserURL: "https://robinhoodchain.blockscout.com/",
