@@ -1,5 +1,6 @@
 import hardhatToolboxViemPlugin from "@nomicfoundation/hardhat-toolbox-viem";
 import { configVariable, defineConfig } from "hardhat/config";
+import 'dotenv/config'
 
 export default defineConfig({
   plugins: [hardhatToolboxViemPlugin],
@@ -21,12 +22,13 @@ export default defineConfig({
   },
   networks: {
     robinhood: {
+      type: "http",
       url: process.env.RH_RPC_URL as string,
       chainId: 4663,
       accounts: [process.env.PRIVATE_KEY as `0x${string}`],
     },
   },
-   etherscan: {
+  etherscan: {
     apiKey: { robinhood: "empty" },
     customChains: [
       {
