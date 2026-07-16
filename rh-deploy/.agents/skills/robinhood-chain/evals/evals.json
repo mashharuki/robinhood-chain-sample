@@ -1,0 +1,50 @@
+{
+  "skill_name": "robinhood-chain",
+  "evals": [
+    {
+      "id": 0,
+      "name": "deploy-config",
+      "prompt": "Robinhood Chainのテストネットとメインネット両方にデプロイできるようにHardhatプロジェクト用の設定を作ってほしい。hardhat.config.ts と、デプロイ&Blockscoutでのコントラクトverify手順をまとめたREADME.mdを作成して。",
+      "expected_output": "hardhat.config.ts with chain IDs 4663/46630, correct RPC URLs, Blockscout verification config (apiKey 'empty', customChains), and a README with deploy/verify steps",
+      "files": [],
+      "assertions": [
+        "Config uses correct mainnet chain ID 4663",
+        "Config uses correct testnet chain ID 46630",
+        "RPC URLs are real Robinhood Chain endpoints (rpc.mainnet.chain.robinhood.com / rpc.testnet.chain.robinhood.com or Alchemy robinhood-* endpoints), not invented URLs",
+        "Verification targets Blockscout API at robinhoodchain.blockscout.com/api (apiKey may be a dummy like 'empty'), not a nonexistent Etherscan instance",
+        "No hardcoded private keys — accounts come from environment variables or keystore",
+        "README documents working deploy and verify commands for both networks"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "portfolio-valuer",
+      "prompt": "Write a Solidity contract called PortfolioValuer for Robinhood Chain mainnet that returns the total USD value of a user's AAPL and TSLA stock token holdings, using the official Chainlink price feeds. Handle decimals correctly and include the safety checks appropriate for stock token price feeds on this chain. Save the .sol file and a short NOTES.md explaining your design decisions.",
+      "expected_output": "A .sol contract using AggregatorV3Interface, correct 8-vs-18 decimal math (÷1e8), correct mainnet token addresses, NOT double-applying uiMultiplier, with staleness/oraclePaused/sequencer-uptime handling appropriate for 24/5 feeds",
+      "files": [],
+      "assertions": [
+        "Uses the correct official mainnet token addresses (AAPL 0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9, TSLA 0x322F0929c4625eD5bAd873c95208D54E1c003b2d) OR takes addresses as constructor params while directing the reader to the official contracts page — inventing fake addresses fails",
+        "Reads prices via Chainlink AggregatorV3Interface.latestRoundData()",
+        "Decimal math is correct: 18-decimal token balance combined with 8-decimal USD feed (divide by 1e8 or use feed.decimals())",
+        "Does NOT apply uiMultiplier on top of the feed price (the Chainlink price already includes the corporate-action multiplier)",
+        "Staleness handling is appropriate for a 24/5 market-hours feed — no naive short heartbeat that would revert every weekend, or the tradeoff is explicitly documented",
+        "Validates price sanity (price > 0 / updatedAt > 0) and addresses sequencer uptime and/or oraclePaused"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "lending-design",
+      "prompt": "Robinhood Chain上で、stock token(AAPLトークンなど)を担保にしてUSDGを借りられるレンディングプロトコルを作りたい。設計ドキュメント(design.md)を書いてほしい。アーキテクチャ、価格オラクルの扱い、清算の仕組み、このチェーン特有の注意点を含めて。",
+      "expected_output": "A design doc covering uiMultiplier/corporate-action handling, 24/5 feed staleness & market-close liquidation policy, sequencer uptime checks, the compose-only (no minting) stock token model, USDG, and compliance restrictions",
+      "files": [],
+      "assertions": [
+        "Explains the compose-only stock token model: developers cannot mint stock tokens (Authorized Participant issuance), so the protocol works with existing tokens",
+        "Covers uiMultiplier / corporate actions (splits, dividends) and their impact on collateral accounting, including monitoring UIMultiplierUpdated",
+        "Oracle/liquidation design accounts for 24/5 market-hours feeds: defines explicit market-closed behavior instead of a naive short staleness window",
+        "Recommends checking the L2 sequencer uptime feed and/or oraclePaused() before trusting prices",
+        "Mentions compliance/jurisdiction restrictions on stock tokens (prohibited in the US, restricted elsewhere)",
+        "Chain facts cited are accurate (e.g. chain ID 4663, Arbitrum-based, USDG 0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168, FCFS ordering) — no fabricated addresses or specs"
+      ]
+    }
+  ]
+}
