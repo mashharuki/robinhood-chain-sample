@@ -1,12 +1,15 @@
 {
   "dependencies": {
+    "@openzeppelin/contracts": "^5.6.1",
     "hardhat": "^3.9.1"
   },
   "type": "module",
   "scripts": {
     "build": "bunx hardhat compile",
     "test": "bunx hardhat test",
-    "deploy": "bunx hardhat ignition deploy ./ignition/modules/Counter.ts"
+    "deploy": "bunx hardhat ignition deploy ./ignition/modules/Counter.ts",
+    "deploy:stock": "bunx hardhat ignition deploy ./ignition/modules/StockToken.ts --network robinhoodTestnet",
+    "deploy:stock:local": "bunx hardhat ignition deploy ./ignition/modules/StockToken.ts --network localhost"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-ignition": "^3.1.8",

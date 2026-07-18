@@ -1,0 +1,60 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_28-87c76ce3ea7e33edbe5c336fdd62910fa83dad4f",
+  "solcVersion": "0.8.28",
+  "solcLongVersion": "0.8.28+commit.7893614a",
+  "compilerType": "solc",
+  "toolVersions": {
+    "hardhat": "3.9.1"
+  },
+  "userSourceNameMap": {
+    "contracts/MockPriceFeed.sol": "project/contracts/MockPriceFeed.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "cancun",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode.linkReferences",
+            "evm.bytecode.object",
+            "evm.bytecode.opcodes",
+            "evm.bytecode.sourceMap",
+            "evm.deployedBytecode.immutableReferences",
+            "evm.deployedBytecode.linkReferences",
+            "evm.deployedBytecode.object",
+            "evm.deployedBytecode.opcodes",
+            "evm.deployedBytecode.sourceMap",
+            "evm.methodIdentifiers"
+          ]
+        }
+      },
+      "remappings": [
+        "project/:@openzeppelin/contracts/=npm/@openzeppelin/contracts@5.6.1/"
+      ]
+    },
+    "sources": {
+      "npm/@openzeppelin/contracts@5.6.1/access/Ownable.sol": {
+        "content": "// SPDX-License-Identifier: MIT\n// OpenZeppelin Contracts (last updated v5.0.0) (access/Ownable.sol)\n\npragma solidity ^0.8.20;\n\nimport {Context} from \"../utils/Context.sol\";\n\n/**\n * @dev Contract module which provides a basic access control mechanism, where\n * there is an account (an owner) that can be granted exclusive access to\n * specific functions.\n *\n * The initial owner is set to the address provided by the deployer. This can\n * later be changed with {transferOwnership}.\n *\n * This module is used through inheritance. It will make available the modifier\n * `onlyOwner`, which can be applied to your functions to restrict their use to\n * the owner.\n */\nabstract contract Ownable is Context {\n    address private _owner;\n\n    /**\n     * @dev The caller account is not authorized to perform an operation.\n     */\n    error OwnableUnauthorizedAccount(address account);\n\n    /**\n     * @dev The owner is not a valid owner account. (eg. `address(0)`)\n     */\n    error OwnableInvalidOwner(address owner);\n\n    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);\n\n    /**\n     * @dev Initializes the contract setting the address provided by the deployer as the initial owner.\n     */\n    constructor(address initialOwner) {\n        if (initialOwner == address(0)) {\n            revert OwnableInvalidOwner(address(0));\n        }\n        _transferOwnership(initialOwner);\n    }\n\n    /**\n     * @dev Throws if called by any account other than the owner.\n     */\n    modifier onlyOwner() {\n        _checkOwner();\n        _;\n    }\n\n    /**\n     * @dev Returns the address of the current owner.\n     */\n    function owner() public view virtual returns (address) {\n        return _owner;\n    }\n\n    /**\n     * @dev Throws if the sender is not the owner.\n     */\n    function _checkOwner() internal view virtual {\n        if (owner() != _msgSender()) {\n            revert OwnableUnauthorizedAccount(_msgSender());\n        }\n    }\n\n    /**\n     * @dev Leaves the contract without owner. It will not be possible to call\n     * `onlyOwner` functions. Can only be called by the current owner.\n     *\n     * NOTE: Renouncing ownership will leave the contract without an owner,\n     * thereby disabling any functionality that is only available to the owner.\n     */\n    function renounceOwnership() public virtual onlyOwner {\n        _transferOwnership(address(0));\n    }\n\n    /**\n     * @dev Transfers ownership of the contract to a new account (`newOwner`).\n     * Can only be called by the current owner.\n     */\n    function transferOwnership(address newOwner) public virtual onlyOwner {\n        if (newOwner == address(0)) {\n            revert OwnableInvalidOwner(address(0));\n        }\n        _transferOwnership(newOwner);\n    }\n\n    /**\n     * @dev Transfers ownership of the contract to a new account (`newOwner`).\n     * Internal function without access restriction.\n     */\n    function _transferOwnership(address newOwner) internal virtual {\n        address oldOwner = _owner;\n        _owner = newOwner;\n        emit OwnershipTransferred(oldOwner, newOwner);\n    }\n}\n"
+      },
+      "npm/@openzeppelin/contracts@5.6.1/utils/Context.sol": {
+        "content": "// SPDX-License-Identifier: MIT\n// OpenZeppelin Contracts (last updated v5.0.1) (utils/Context.sol)\n\npragma solidity ^0.8.20;\n\n/**\n * @dev Provides information about the current execution context, including the\n * sender of the transaction and its data. While these are generally available\n * via msg.sender and msg.data, they should not be accessed in such a direct\n * manner, since when dealing with meta-transactions the account sending and\n * paying for execution may not be the actual sender (as far as an application\n * is concerned).\n *\n * This contract is only required for intermediate, library-like contracts.\n */\nabstract contract Context {\n    function _msgSender() internal view virtual returns (address) {\n        return msg.sender;\n    }\n\n    function _msgData() internal view virtual returns (bytes calldata) {\n        return msg.data;\n    }\n\n    function _contextSuffixLength() internal view virtual returns (uint256) {\n        return 0;\n    }\n}\n"
+      },
+      "project/contracts/interfaces/AggregatorV3Interface.sol": {
+        "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.28;\n\n/// @title Chainlink AggregatorV3Interface（学習用に最小定義。Chainlink パッケージは導入しない）\ninterface AggregatorV3Interface {\n    /// @notice USD フィードは 8 decimals（例: 30000000000 = $300.00）\n    function decimals() external view returns (uint8);\n\n    function latestRoundData()\n        external\n        view\n        returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound);\n}\n\n/// @title Robinhood Chain の Stock Token フィードが追加で公開する関数\n/// @notice コーポレートアクション処理中は true になり、価格を「利用不可」として扱うべき\ninterface IPausableOracle {\n    function oraclePaused() external view returns (bool);\n}\n"
+      },
+      "project/contracts/MockPriceFeed.sol": {
+        "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.28;\n\nimport { Ownable } from \"@openzeppelin/contracts/access/Ownable.sol\";\nimport { AggregatorV3Interface, IPausableOracle } from \"./interfaces/AggregatorV3Interface.sol\";\n\n/// @title MockPriceFeed — Chainlink フィードを模した学習用オラクル\n/// @notice 実物では Chainlink が唯一のオラクルプロバイダで、各 Stock Token に USD フィード\n///         （8 decimals）がある。重要な性質:\n///         - フィード価格には uiMultiplier が既に織り込まれている（= 1トークンの価格）。\n///           自分で multiplier を掛けてはいけない（二重適用になる）。\n///         - 株式フィードは 24/5（市場時間）でしか更新されない → 固定の短い staleness\n///           チェックは週末に誤作動する。\n///         - コーポレートアクション中は oraclePaused() が true になる。\ncontract MockPriceFeed is Ownable, AggregatorV3Interface, IPausableOracle {\n    uint80 private _roundId;\n    int256 private _answer;\n    uint256 private _updatedAt;\n    bool private _oraclePaused;\n\n    /// @param initialAnswer 初期価格（8 decimals。例: 200_00000000 = $200.00）\n    constructor(int256 initialAnswer) Ownable(msg.sender) {\n        _setAnswer(initialAnswer);\n    }\n\n    /// @notice USD フィードは 8 decimals（トークンの 18 decimals と混同しないこと）\n    function decimals() external pure returns (uint8) {\n        return 8;\n    }\n\n    function latestRoundData()\n        external\n        view\n        returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound)\n    {\n        return (_roundId, _answer, _updatedAt, _updatedAt, _roundId);\n    }\n\n    /// @inheritdoc IPausableOracle\n    function oraclePaused() external view returns (bool) {\n        return _oraclePaused;\n    }\n\n    /// @notice 価格を更新（Chainlink ノード群の役を演じる）\n    function setAnswer(int256 answer) external onlyOwner {\n        _setAnswer(answer);\n    }\n\n    /// @notice コーポレートアクション中のオラクル停止を模擬\n    function setOraclePaused(bool paused) external onlyOwner {\n        _oraclePaused = paused;\n    }\n\n    function _setAnswer(int256 answer) private {\n        _roundId += 1;\n        _answer = answer;\n        _updatedAt = block.timestamp;\n    }\n}\n"
+      }
+    }
+  }
+}

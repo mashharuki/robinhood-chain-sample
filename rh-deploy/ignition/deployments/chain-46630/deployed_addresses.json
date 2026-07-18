@@ -1,3 +1,6 @@
 {
-  "CounterModule#Counter": "0xfDFaDffE28d17935A48ffB1Ab3076dBc8CadE623"
+  "CounterModule#Counter": "0xfDFaDffE28d17935A48ffB1Ab3076dBc8CadE623",
+  "StockTokenModule#MockPriceFeed": "0x77D775cCC1434D82D8d74e790C25c91FFC8e6108",
+  "StockTokenModule#StockToken": "0xE47EBb7a4F13152b485886c1d74Ba1E58a8E4E4A",
+  "StockTokenModule#StockViewer": "0xAAF6A7A22f2bcd602e280A4b42fF73FE0A4e7DB1"
 }

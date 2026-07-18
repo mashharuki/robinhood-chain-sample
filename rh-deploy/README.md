@@ -4,6 +4,8 @@ This project showcases a Hardhat 3 project using the native Node.js test runner 
 
 To learn more about Hardhat 3, please visit the [Getting Started guide](https://hardhat.org/docs/getting-started#getting-started-with-hardhat-3). To share your feedback, join our [Hardhat 3](https://hardhat.org/hardhat3-telegram-group) Telegram group or [open an issue](https://github.com/NomicFoundation/hardhat/issues/new) in our GitHub issue tracker.
 
+> **Stock Token 学習キット**: Robinhood Chain の Stock Token（トークン化株式）の仕組みを手を動かして学ぶためのコントラクト・デプロイモジュール・タスク群を同梱しています。使い方は [docs/stocktoken-learning.md](./docs/stocktoken-learning.md) を参照。
+
 ## Project Overview
 
 This example project includes:
