@@ -1,0 +1,53 @@
+{
+  "skill_name": "robinhood-apps",
+  "evals": [
+    {
+      "id": 0,
+      "name": "ts-crypto-client",
+      "prompt": "I want to build a small TypeScript module that connects to the Robinhood crypto trading API, fetches my BTC holdings and the current BTC price, and places a market buy order for about $10 worth of BTC. My API key will be in the RH_API_KEY env var and my base64 private key in RH_PRIVATE_KEY. Please write the module plus unit tests I can run without hitting the real API.",
+      "expected_output": "A TypeScript client using Ed25519 signing (x-api-key/x-signature/x-timestamp) against trading.robinhood.com with correct endpoint paths, converting $10 to asset_quantity via estimated/best price, idempotent client_order_id, and offline unit tests (mocked transport and/or the official signature test vector).",
+      "files": [],
+      "assertions": [
+        "auth-headers: request code sends all three headers x-api-key, x-signature, x-timestamp",
+        "signature-message: Ed25519 signature is computed over the concatenation api_key + timestamp + path + method + body (path includes query string and trailing slash)",
+        "correct-endpoints: uses base URL https://trading.robinhood.com and real documented paths (/api/v1/crypto/trading/holdings/, best_bid_ask or estimated_price, /api/v1/crypto/trading/orders/)",
+        "fresh-timestamp: Unix timestamp in seconds generated at request time (not cached/reused across retries)",
+        "idempotency: order placement uses a UUID client_order_id",
+        "usd-to-quantity: converts the $10 budget into asset_quantity from a fetched price (market_order_config has no quote_amount field)",
+        "offline-tests: unit tests exist and run without network access (mocked transport and/or the official signature test vector)",
+        "tests-pass: the delivered tests were executed and reported passing"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "dca-bot-planning-ja",
+      "prompt": "Robinhoodで毎週自動でBTCとETHを$50ずつ積立購入するボットを作りたいです。まず企画・設計ドキュメント(アーキテクチャ、リスク対策、テスト戦略を含む)をまとめてから、実装の骨組み(コード)を作ってください。",
+      "expected_output": "A planning/design doc covering the official Crypto Trading API (US-only, no sandbox), key custody, rate limits, idempotency, order state reconciliation, fee/spread awareness, and a layered test strategy, followed by skeleton TypeScript (or Python) code consistent with the design.",
+      "files": [],
+      "assertions": [
+        "official-api: design identifies the official Robinhood Crypto Trading API (trading.robinhood.com, Ed25519 auth) as the integration surface and notes it is US-customers-only",
+        "no-unofficial-libs: does not build on reverse-engineered private-API libraries (robin_stocks, pyrh, etc.)",
+        "key-custody: design covers private-key custody (env/secret manager, server-side signing only)",
+        "idempotency-design: scheduled purchases use a deterministic or persisted client_order_id so a rerun cannot double-buy",
+        "operational-limits: design mentions rate limits (100/min) and/or the 30-second timestamp validity window",
+        "reconciliation: design covers order-state tracking/reconciliation (open/partially_filled/filled/canceled/failed) rather than fire-and-forget",
+        "no-sandbox-testing: test strategy acknowledges there is no sandbox and proposes safe layers (signature self-test, mocked transport, read-only smoke, micro/far-off-market order)",
+        "skeleton-consistent: skeleton code exists and matches the documented endpoints/auth of the design"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "agentic-stock-trading",
+      "prompt": "How can I let an AI agent like Claude trade stocks in my Robinhood account? Set up whatever config is needed on my machine and explain the safest way to do this.",
+      "expected_output": "Points to Robinhood's official Agentic Trading MCP server (https://agent.robinhood.com/mcp/trading), e.g. `claude mcp add robinhood-trading --transport http ...`, explains the dedicated Agentic account/budget and safety controls, and does NOT recommend unofficial private-API libraries like robin_stocks.",
+      "files": [],
+      "assertions": [
+        "official-mcp: recommends Robinhood's official Agentic Trading MCP server at https://agent.robinhood.com/mcp/trading",
+        "correct-setup: gives a working connection method (e.g. claude mcp add robinhood-trading --transport http https://agent.robinhood.com/mcp/trading or equivalent connector config)",
+        "dedicated-account: explains the dedicated Agentic account with an isolated budget (agent cannot touch the rest of the portfolio)",
+        "safety-controls: mentions concrete safety controls (order preview/approval, trade notifications, ability to disconnect, stocks-only beta)",
+        "no-unofficial-apis: does not present unofficial/reverse-engineered Robinhood APIs (robin_stocks, pyrh) as the way to trade stocks"
+      ]
+    }
+  ]
+}
