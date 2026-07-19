@@ -192,4 +192,24 @@ contract StockSwapReceiverTest is Test {
         receiver.withdrawStock(address(this), 10e18); // owner は回収できる
         assertEq(stock.balanceOf(address(this)), 10e18);
     }
+
+    // ---------------- 成功swapの売上(決済トークン)回収 ----------------
+
+    function test_WithdrawPaymentOnlyOwner() public {
+        _deliver("m10", srcSender, alice, 1_000e18, 5e18); // 成功swap: 1000 mUSD が売上として滞留
+
+        vm.prank(alice);
+        vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, alice));
+        receiver.withdrawPayment(alice, 1_000e18);
+
+        receiver.withdrawPayment(address(this), 1_000e18); // owner は売上を回収できる
+        assertEq(payToken.balanceOf(address(this)), 1_000e18);
+    }
+
+    function test_RevertWhen_WithdrawPaymentEatsIntoRefunds() public {
+        _deliver("m11", srcSender, alice, 1_000e18, 6e18); // 失敗swap: 1000 mUSD が escrow(refunds)
+
+        vm.expectRevert(bytes("StockSwapReceiver: refunds reserved"));
+        receiver.withdrawPayment(address(this), 1_000e18);
+    }
 }

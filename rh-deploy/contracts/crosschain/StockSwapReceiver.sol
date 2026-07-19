@@ -46,6 +46,8 @@ contract StockSwapReceiver is CCIPReceiver, Ownable {
     mapping(uint64 => mapping(address => bool)) public allowlistedSources;
     /// @notice swap 失敗時に退避された決済トークン(recipient => 量)
     mapping(address => uint256) public refunds;
+    /// @notice escrow 中の決済トークン総額(refunds の合計)。owner の売上回収がここを侵さないようにするための追跡値。
+    uint256 public totalRefunds;
 
     constructor(address router_, address stockToken_, address paymentToken_, address priceFeed_, uint256 maxStaleness_)
         CCIPReceiver(router_)
@@ -78,6 +80,7 @@ contract StockSwapReceiver is CCIPReceiver, Ownable {
             emit SwapExecuted(message.messageId, recipient, amountIn, amountOut, price);
         } catch (bytes memory reason) {
             refunds[recipient] += amountIn;
+            totalRefunds += amountIn;
             emit SwapFailed(message.messageId, recipient, amountIn, reason);
         }
     }
@@ -109,6 +112,7 @@ contract StockSwapReceiver is CCIPReceiver, Ownable {
         uint256 amount = refunds[msg.sender];
         if (amount == 0) revert NoRefundAvailable();
         refunds[msg.sender] = 0;
+        totalRefunds -= amount;
         paymentToken.safeTransfer(msg.sender, amount);
         emit FailedSwapWithdrawn(msg.sender, amount);
     }
@@ -116,5 +120,15 @@ contract StockSwapReceiver is CCIPReceiver, Ownable {
     /// @notice 発行体役(owner)によるプール補充の逆操作 — 余剰 Stock Token の回収。
     function withdrawStock(address to, uint256 amount) external onlyOwner {
         stockToken.safeTransfer(to, amount);
+    }
+
+    /// @notice 成功した swap の売上(決済トークン)を回収する。
+    /// @dev escrow 中の refunds 残高は引き出せない(失敗した利用者の取り分を保護する)。
+    function withdrawPayment(address to, uint256 amount) external onlyOwner {
+        require(
+            paymentToken.balanceOf(address(this)) - amount >= totalRefunds,
+            "StockSwapReceiver: refunds reserved"
+        );
+        paymentToken.safeTransfer(to, amount);
     }
 }
