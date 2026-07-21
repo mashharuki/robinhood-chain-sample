@@ -140,3 +140,109 @@ export const stockTasks = [
     .setAction(() => import("./stock-live.js"))
     .build(),
 ];
+
+/** CrossChainSwapModule のデプロイ済みコントラクトを指すオプション（省略時は ignition の記録から解決） */
+function deployedAddressOption<Name extends string>(name: Name, contract: string) {
+  return {
+    name,
+    description: `${contract} のアドレス（省略時は ignition のデプロイ記録から解決）`,
+    type: ArgumentType.STRING,
+    defaultValue: "",
+  } as const;
+}
+
+export const crossChainSwapTasks = [
+  task("swap:buy", "クロスチェーンswapサンプル: 決済トークンでmAAPLを購入（StockSwapSender.buyStock）")
+    .addOption({
+      name: "amount",
+      description: "決済トークンの送金量（トークン単位。例: 100）",
+      type: ArgumentType.STRING,
+      defaultValue: "100",
+    })
+    .addOption({
+      name: "minAmountOut",
+      description: "最小受取mAAPL量（スリッページ保護。未達なら宛先側でescrow退避される）",
+      type: ArgumentType.STRING,
+      defaultValue: "0",
+    })
+    .addOption({
+      name: "recipient",
+      description: "mAAPLの受取アドレス（省略時は自分のウォレット）",
+      type: ArgumentType.STRING,
+      defaultValue: "",
+    })
+    .addOption({
+      name: "value",
+      description: "CCIP手数料に充てるnative送金量（余剰は自動返金される。ローカルシミュレータ想定のデフォルト）",
+      type: ArgumentType.STRING,
+      defaultValue: "1",
+    })
+    .addOption(deployedAddressOption("sender", "StockSwapSender"))
+    .addOption(deployedAddressOption("receiver", "StockSwapReceiver"))
+    .addOption(deployedAddressOption("simulator", "CCIPLocalSimulator"))
+    .setAction(() => import("./swap-buy.js"))
+    .build(),
+
+  task("swap:info", "クロスチェーンswapサンプルの状態表示（プール残高・allowlist・escrow・フィード）")
+    .addOption(deployedAddressOption("sender", "StockSwapSender"))
+    .addOption(deployedAddressOption("receiver", "StockSwapReceiver"))
+    .addOption(deployedAddressOption("simulator", "CCIPLocalSimulator"))
+    .addOption({
+      name: "holder",
+      description: "escrow残高を照会するアドレス（省略時は自分のウォレット）",
+      type: ArgumentType.STRING,
+      defaultValue: "",
+    })
+    .setAction(() => import("./swap-info.js"))
+    .build(),
+
+  // 実テストネット（Ethereum Sepolia → Robinhood Chain Testnet）向け。
+  // ignition/modules/CrossChainSwap{Sender,Receiver}Testnet.ts のデプロイ後に使う。
+  task("swap:allowlist-source", "実テストネット専用セットアップ: ReceiverにSender(sepolia)からの受信を許可する")
+    .addOption(deployedAddressOption("receiver", "StockSwapReceiver"))
+    .addOption(deployedAddressOption("sender", "StockSwapSender"))
+    .setAction(() => import("./swap-allowlist-source.js"))
+    .build(),
+
+  task("swap:buy-testnet", "実テストネット（Ethereum Sepolia → Robinhood Chain Testnet）で本物のCCIPメッセージを送る")
+    .addOption({
+      name: "amount",
+      description: "決済トークンの送金量（トークン単位。drip()回数がかかるため少なめ推奨。例: 5）",
+      type: ArgumentType.STRING,
+      defaultValue: "5",
+    })
+    .addOption({
+      name: "minAmountOut",
+      description: "最小受取mAAPL量（スリッページ保護。未達なら宛先側でescrow退避される）",
+      type: ArgumentType.STRING,
+      defaultValue: "0",
+    })
+    .addOption({
+      name: "recipient",
+      description: "mAAPLの受取アドレス（省略時は自分のウォレット）",
+      type: ArgumentType.STRING,
+      defaultValue: "",
+    })
+    .addOption({
+      name: "feeBufferBps",
+      description: "Router.getFee見積りに上乗せするバッファ（bps単位。余剰は自動返金される）",
+      type: ArgumentType.INT,
+      defaultValue: 1_000, // 10%
+    })
+    .addOption(deployedAddressOption("sender", "StockSwapSender"))
+    .addOption(deployedAddressOption("receiver", "StockSwapReceiver"))
+    .setAction(() => import("./swap-buy-testnet.js"))
+    .build(),
+
+  task("swap:info-testnet", "実テストネットの状態表示（Sepolia側・Robinhood Chain Testnet側を横断して表示）")
+    .addOption(deployedAddressOption("sender", "StockSwapSender"))
+    .addOption(deployedAddressOption("receiver", "StockSwapReceiver"))
+    .addOption({
+      name: "holder",
+      description: "escrow残高を照会するアドレス（省略時は自分のウォレット）",
+      type: ArgumentType.STRING,
+      defaultValue: "",
+    })
+    .setAction(() => import("./swap-info-testnet.js"))
+    .build(),
+];

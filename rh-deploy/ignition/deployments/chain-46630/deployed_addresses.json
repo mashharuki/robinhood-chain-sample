@@ -2,5 +2,8 @@
   "CounterModule#Counter": "0xfDFaDffE28d17935A48ffB1Ab3076dBc8CadE623",
   "StockTokenModule#MockPriceFeed": "0x77D775cCC1434D82D8d74e790C25c91FFC8e6108",
   "StockTokenModule#StockToken": "0xE47EBb7a4F13152b485886c1d74Ba1E58a8E4E4A",
-  "StockTokenModule#StockViewer": "0xAAF6A7A22f2bcd602e280A4b42fF73FE0A4e7DB1"
+  "StockTokenModule#StockViewer": "0xAAF6A7A22f2bcd602e280A4b42fF73FE0A4e7DB1",
+  "CrossChainSwapReceiverTestnetModule#MockPriceFeed": "0xC40b5E9793e1d75a2C955169b0D63199bef661E2",
+  "CrossChainSwapReceiverTestnetModule#StockToken": "0x0923e962F5aB210bCc6b79b8B093292cC70E8ACC",
+  "CrossChainSwapReceiverTestnetModule#StockSwapReceiver": "0x114EE3ea51D6eba17aD12ee9F27714dcd1DA6DAa"
 }

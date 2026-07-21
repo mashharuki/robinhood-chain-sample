@@ -1,12 +1,21 @@
 import hardhatToolboxViemPlugin from "@nomicfoundation/hardhat-toolbox-viem";
 import { configVariable, defineConfig } from "hardhat/config";
 import 'dotenv/config'
-import { stockTasks } from "./tasks/index.js";
+import { crossChainSwapTasks, stockTasks } from "./tasks/index.js";
 
 export default defineConfig({
   plugins: [hardhatToolboxViemPlugin],
-  tasks: [...stockTasks],
+  tasks: [...stockTasks, ...crossChainSwapTasks],
   solidity: {
+    // CCIPLocalSimulator / BurnMintERC677Helper (CCIP-BnM) / IRouterClient は node_modules
+    // 内の依存で、通常はコンパイルグラフに含まれても artifact が生成されない。ignition や
+    // tasks から viem.getContractAt / deployContract で名前解決できるよう明示的に root file
+    // として指定する。IRouterClient は実テストネットで CCIP 手数料(getFee)を見積もるのに使う。
+    npmFilesToBuild: [
+      "@chainlink/local/src/ccip/CCIPLocalSimulator.sol",
+      "@chainlink/local/src/ccip/BurnMintERC677Helper.sol",
+      "@chainlink/contracts-ccip/contracts/interfaces/IRouterClient.sol",
+    ],
     profiles: {
       default: {
         version: "0.8.28",
@@ -39,6 +48,15 @@ export default defineConfig({
       type: "http",
       url: process.env.RH_TESTNET_RPC_URL ?? "https://rpc.testnet.chain.robinhood.com",
       chainId: 46630,
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY as `0x${string}`] : [],
+    },
+    // クロスチェーンswapサンプルの送信元役（実テストネット）。CCIPディレクトリで
+    // Robinhood Chain Testnet との有効なレーンが確認できるチェーン。
+    // https://docs.chain.link/ccip/directory/testnet/chain/ethereum-sepolia
+    sepolia: {
+      type: "http",
+      url: process.env.SEPOLIA_RPC_URL ?? "https://ethereum-sepolia-rpc.publicnode.com",
+      chainId: 11155111,
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY as `0x${string}`] : [],
     },
   },

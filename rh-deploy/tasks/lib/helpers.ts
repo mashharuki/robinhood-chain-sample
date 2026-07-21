@@ -4,11 +4,12 @@ import { formatUnits } from "viem";
 
 export const MULTIPLIER_SCALE = 10n ** 18n;
 
-/** Ignition の deployed_addresses.json から StockTokenModule のアドレスを解決する */
+/** Ignition の deployed_addresses.json から指定モジュールのアドレスを解決する */
 export async function resolveDeployed(
   rootDir: string,
   chainId: number,
-  contract: "StockToken" | "MockPriceFeed" | "StockViewer",
+  contract: string,
+  moduleName: string = "StockTokenModule",
 ): Promise<`0x${string}`> {
   const file = path.join(rootDir, "ignition", "deployments", `chain-${chainId}`, "deployed_addresses.json");
   let json: Record<string, string>;
@@ -18,12 +19,12 @@ export async function resolveDeployed(
     throw new Error(
       `chain-${chainId} へのデプロイ記録が見つかりません (${file})。` +
         `先に \`bun run deploy:stock\`（または --network を合わせて ignition deploy）を実行するか、` +
-        `--token / --feed / --viewer オプションでアドレスを直接指定してください。`,
+        `アドレスをオプションで直接指定してください。`,
     );
   }
-  const address = json[`StockTokenModule#${contract}`];
+  const address = json[`${moduleName}#${contract}`];
   if (address === undefined) {
-    throw new Error(`deployed_addresses.json に StockTokenModule#${contract} がありません`);
+    throw new Error(`deployed_addresses.json に ${moduleName}#${contract} がありません`);
   }
   return address as `0x${string}`;
 }
